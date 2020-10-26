@@ -16,5 +16,5 @@ print(int(y),int(3.54))
 print(int(z))
 #报错 
 #print(int('aaa'))
-#其他类型转str 打印
+#其他类型转str 打印 5 3.14 <class 'str'>
 print(str(x),str(y),type(str(x)))
