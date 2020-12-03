@@ -20,6 +20,6 @@ names['three']='merkel'
 print(names)
 
 # 判断键是否在字典中 打印 True
-print('one' in names #也可以用 'one' in names.keys()
+print('one' in names) #也可以用 'one' in names.keys()
 # 判断值是否在字典中 打印 True
 print('merkel' in names.values())
