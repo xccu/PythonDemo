@@ -5,3 +5,5 @@ print(message)
 #下划线连接两个单词的变量
 greeting_message='Hello World!'
 print(greeting_message)
+
+print(type(+3E10))
