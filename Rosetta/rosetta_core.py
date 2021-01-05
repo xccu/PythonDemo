@@ -1,7 +1,7 @@
 from Crypto.Cipher import AES
 from Crypto import Random
 
-
+#加密解密类
 class AES_Util():
      #构造函数
     def __init__(self):
@@ -25,3 +25,36 @@ class AES_Util():
         text = mydecrypt.decrypt(ciptext[16:]).decode()
         print(text)
         return text
+
+#文件读写类
+class Flie_Util():
+     #构造函数
+    def __init__(self):
+        self.s=""
+
+    #读文件
+    def read(self,filePath):
+        try:
+            print(filePath)
+            f = open(filePath, 'r')
+            result = f.read()
+            print(result)
+            return result
+        except:
+             print("Error")
+             return ""
+        finally:
+            if f:
+                f.close()
+    
+    #写文件
+    def write(self,filePath,data):
+        try:
+            print(filePath)
+            f = open(filePath, 'w')
+            result = f.write(data)
+        except:
+             print("Error")
+        finally:
+            if f:
+                f.close()
