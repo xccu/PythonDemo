@@ -85,4 +85,4 @@ class Init_Window():
 
         self.filePath=self.filePath.replace('.txt','.rosetta')
         fileUtil=Flie_Util()
-        fileUtil.write(self.filePath,self.databyte)
+        fileUtil.writeBytes(self.filePath,self.databyte)

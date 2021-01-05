@@ -52,9 +52,21 @@ class Flie_Util():
         try:
             print(filePath)
             f = open(filePath, 'w')
-            result = f.write(data)
+            f.write(data)
         except:
-             print("Error")
+             print("Error in write")
+        finally:
+            if f:
+                f.close()
+
+    #写字节
+    def writeBytes(self,filePath,bytes):
+        try:
+            print(filePath)
+            f = open(filePath, 'wb')
+            f.write(bytes)
+        except:
+             print("Error in writeBytes")
         finally:
             if f:
                 f.close()
