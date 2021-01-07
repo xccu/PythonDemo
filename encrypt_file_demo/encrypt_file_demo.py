@@ -1,6 +1,3 @@
-
-import json
-from pathlib import Path
 from secrets import token_bytes
  
 def random_key(length):
@@ -8,54 +5,56 @@ def random_key(length):
     key_int = int.from_bytes(key, 'big')
     return key_int
 
-def encrypt(raw):
-    raw_bytes = raw.encode()
+def encryptBytes(raw_bytes):
     raw_int = int.from_bytes(raw_bytes, 'big')
     key_int = random_key(len(raw_bytes))
     return raw_int ^ key_int, key_int
 
-
-def decrypt(encrypted, key_int):
+def decryptBytes(encrypted, key_int):
     decrypted = encrypted ^ key_int
     length = (decrypted.bit_length() + 7) // 8
     decrypted_bytes = int.to_bytes(decrypted, length, 'big') 
+    return decrypted_bytes
 
 
-def encrypt_file(path, key_path=None, *, encoding='utf-8'):
-    path = Path(path)
-    cwd = path.cwd() / path.name.split('.')[0]
-    path_encrypted = cwd / path.name 
-    if key_path is None:
-        key_path = cwd / 'key'
-    if not cwd.exists():
-        cwd.mkdir()
-        path_encrypted.touch()
-        key_path.touch()
- 
-    with path.open('rt', encoding=encoding) as f1, \
-        path_encrypted.open('wt', encoding=encoding) as f2, \
-            key_path.open('wt', encoding=encoding) as f3:
-        encrypted, key = encrypt(f1.read())
-        json.dump(encrypted, f2)
-        json.dump(key, f3)
+
+def encrypt_b(path, key_path=None):
+
+    f = open(path,'rb')
+    encrypted, key = encryptBytes(f.read())
+    f.close()
+
+    f = open(path, 'w')
+    f.write(str(encrypted))
+    f.close()
+
+    f=open(path+'.key','w')
+    f.write(str(key))
+    f.close()
 
 
-def decrypt_file(path_encrypted, key_path=None, *, encoding='utf-8'):
-    path_encrypted = Path(path_encrypted)
-    cwd = path_encrypted.cwd()
-    path_decrypted = cwd / 'decrypted' 
-    if not path_decrypted.exists():
-        path_decrypted.mkdir()
-        path_decrypted /= path_encrypted.name
-        path_decrypted.touch()
-    if key_path is None:
-        key_path = cwd / 'key'
-    with path_encrypted.open('rt', encoding=encoding) as f1, \
-        key_path.open('rt', encoding=encoding) as f2, \
-        path_decrypted.open('wt', encoding=encoding) as f3:
-        decrypted = decrypt(json.load(f1), json.load(f2))
+def decrypte_b(path, key_path=None):
+
+    f = open(path,'r')
+    encrypted = int(f.read())
+    f.close()
+
+    f = open(key_path,'r')
+    key = int(f.read())
+    f.close()
+
+    f = open(path, 'w')
+    f.write(str(encrypted))
+    f.close()
+
+    decrypted = decryptBytes(encrypted, key)
+    f = open(path, 'wb')
+    f.write(decrypted)
+    f.close()
+
 
 
 if __name__ == '__main__':
 
-   encrypt_file("url.docx")
+   #encrypt_b("img.jpg")
+   decrypte_b("img.jpg","img.jpg.key")
