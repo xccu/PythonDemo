@@ -20,7 +20,7 @@ def decryptBytes(encrypted, key_int):
 
 
 def encrypt(path, key_path=None):
-
+    
     f = open(path,'rb')
     encrypted, key = encryptBytes(f.read())
     f.close()
@@ -57,5 +57,18 @@ def decrypt(path, key_path=None):
 
 if __name__ == '__main__':
 
+
+    bytes_array=[]
+    f = open("img.jpg",'rb')
+    for line in f.readlines():                          #依次读取每行  
+        bytes_array.append(line)
+        print("{}".format(line))
+    print(len(bytes_array))
+
+
+    f = open("img1.jpg", 'wb')
+    f.writelines(bytes_array)
+    f.close()
+
    #encrypt("img.jpg")
-   decrypt("img.jpg","img.jpg.key")
+   #decrypt("img.jpg","img.jpg.key")
