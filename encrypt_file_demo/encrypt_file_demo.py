@@ -1,5 +1,6 @@
 from secrets import token_bytes
  
+ #异或方式加密解密任意文件
 def random_key(length):
     key = token_bytes(nbytes=length)
     key_int = int.from_bytes(key, 'big')
@@ -18,7 +19,7 @@ def decryptBytes(encrypted, key_int):
 
 
 
-def encrypt_b(path, key_path=None):
+def encrypt(path, key_path=None):
 
     f = open(path,'rb')
     encrypted, key = encryptBytes(f.read())
@@ -33,7 +34,7 @@ def encrypt_b(path, key_path=None):
     f.close()
 
 
-def decrypte_b(path, key_path=None):
+def decrypt(path, key_path=None):
 
     f = open(path,'r')
     encrypted = int(f.read())
@@ -56,5 +57,5 @@ def decrypte_b(path, key_path=None):
 
 if __name__ == '__main__':
 
-   #encrypt_b("img.jpg")
-   decrypte_b("img.jpg","img.jpg.key")
+   #encrypt("img.jpg")
+   decrypt("img.jpg","img.jpg.key")
