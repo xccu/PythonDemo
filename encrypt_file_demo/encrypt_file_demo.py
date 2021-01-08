@@ -54,19 +54,33 @@ def decrypt(path, key_path=None):
     f.close()
 
 
+def read_file_stream(filepath,length):
+    bytes_array=[]
+    with open(filepath,'rb') as f:
+        while True:
+            dt=f.read(length)
+            if dt is not b'': #读取到结尾则结束
+                bytes_array.append(dt)
+                print(len(dt))
+            else:
+               break
+    return bytes_array
+
 
 if __name__ == '__main__':
 
 
-    bytes_array=[]
-    f = open("img.jpg",'rb')
-    for line in f.readlines():                          #依次读取每行  
-        bytes_array.append(line)
-        print("{}".format(line))
+    bytes_array=read_file_stream("url.txt",100)
+
+    #f = open("img.jpg",'rb')
+
+    #for line in f.read(100):                          #依次读取每行  
+    #    bytes_array.append(line)
+    #    print("{}".format(line))
     print(len(bytes_array))
 
 
-    f = open("img1.jpg", 'wb')
+    f = open("url1.txt", 'wb')
     f.writelines(bytes_array)
     f.close()
 
