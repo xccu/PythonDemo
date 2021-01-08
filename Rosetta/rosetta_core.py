@@ -1,7 +1,13 @@
 from Crypto.Cipher import AES
 from Crypto import Random
+import base64
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_v1_5 as Cipher_PKC
+from Crypto import Random
+from Crypto.Hash import SHA256
+from Crypto.Signature import PKCS1_v1_5 as Signature_PKC
 
-#加密解密类
+#AES加密解密类
 class AES_Util():
      #构造函数
     def __init__(self):
@@ -25,6 +31,69 @@ class AES_Util():
         text = mydecrypt.decrypt(ciptext[16:]).decode()
         print(text)
         return text
+
+#RSA加密解密类
+class RSA_Util():
+    #构造函数
+    def __init__(self):
+        self.file_Util = Flie_Util()
+
+    #创建RSA密钥对(公钥+私钥)
+    def create_rsa_key(self):
+
+        # 伪随机数生成器
+        random_gen = Random.new().read
+        # 生成秘钥对实例对象：1024是秘钥的长度
+        rsa = RSA.generate(1024, random_gen)
+
+        # 秘钥对的生成
+        private_pem = rsa.exportKey()
+        with open("client_private.pem", "wb") as f:
+            f.write(private_pem)
+
+        public_pem = rsa.publickey().exportKey()
+        with open("client_public.pem", "wb") as f:
+            f.write(public_pem)
+
+    # 使用公钥对文件进行rsa 分段加密
+    def encrypt(self,filepath):
+
+        #bytes读取文件
+        bytes_array=self.file_Util.read_file_stream(filepath,100)
+
+        # 加载公钥
+        rsa_key = RSA.import_key(open("client_public.pem").read() )
+
+        # 分段加密
+        en_bytes_array=[]
+        cipher_rsa = Cipher_PKC.new(rsa_key)
+        for bytes in bytes_array:
+            en_data = cipher_rsa.encrypt(bytes)
+            #print(len(en_data))
+            en_bytes_array.append(en_data)
+
+        #写加密后的文件
+        self.file_Util.write_file_stream(filepath,en_bytes_array)
+
+    # 使用私钥对文件进行rsa 分段解密
+    def decrypt(self,filepath):
+
+        #bytes读取文件
+        en_bytes_array=self.file_Util.read_file_stream(filepath,128)
+
+        # 读取私钥
+        private_key = RSA.import_key(open("client_private.pem").read())
+
+        # 分段解密
+        bytes_array=[]
+        cipher_rsa = Cipher_PKC.new(private_key)
+        for bytes in en_bytes_array:
+            data = cipher_rsa.decrypt(bytes,None)
+            #print(len(data))
+            bytes_array.append(data)
+        
+        #写解密后的文件
+        self.file_Util.write_file_stream(filepath,bytes_array)
 
 #文件读写类
 class Flie_Util():
@@ -67,6 +136,36 @@ class Flie_Util():
             f.write(bytes)
         except:
              print("Error in writeBytes")
+        finally:
+            if f:
+                f.close()
+
+    #bytes分段读取文件
+    def read_file_stream(self,filepath,length):
+        bytes_array=[]
+        try:
+            f = open(filepath,'rb')
+            while True:
+                dt=f.read(length)
+                if dt is not b'': #读取到结尾则结束
+                    bytes_array.append(dt)
+                    #print(dt)
+                else:
+                    break
+        except:
+             print("Error in read_file_stream")
+        finally:
+            if f:
+                f.close()
+        return bytes_array
+
+    #bytes列表写入文件
+    def write_file_stream(self,filepath,bytes_array):
+        try:
+            f= open(filepath, 'wb')
+            f.writelines(bytes_array)
+        except:
+             print("Error in write_file_stream")
         finally:
             if f:
                 f.close()
