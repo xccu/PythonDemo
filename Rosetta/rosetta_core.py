@@ -37,68 +37,80 @@ class RSA_Util():
     #构造函数
     def __init__(self):
         self.file_Util = Flie_Util()
+        self.exception_util=Exception_Util()
 
     #创建RSA密钥对(公钥+私钥)
     def create_rsa_key(self):
+        try:
+            # 伪随机数生成器
+            random_gen = Random.new().read
+            # 生成秘钥对实例对象：1024是秘钥的长度
+            rsa = RSA.generate(1024, random_gen)
 
-        # 伪随机数生成器
-        random_gen = Random.new().read
-        # 生成秘钥对实例对象：1024是秘钥的长度
-        rsa = RSA.generate(1024, random_gen)
+            # 秘钥对的生成
+            private_pem = rsa.exportKey()
+            with open("client_private.pem", "wb") as f:
+                f.write(private_pem)
 
-        # 秘钥对的生成
-        private_pem = rsa.exportKey()
-        with open("client_private.pem", "wb") as f:
-            f.write(private_pem)
-
-        public_pem = rsa.publickey().exportKey()
-        with open("client_public.pem", "wb") as f:
-            f.write(public_pem)
+            public_pem = rsa.publickey().exportKey()
+            with open("client_public.pem", "wb") as f:
+                f.write(public_pem)
+            return "s_"
+        except Exception as ex:
+            return self.exception_util.print_exctption("create_rsa_key",ex)
 
     # 使用公钥对文件进行rsa 分段加密
     def encrypt(self,filepath):
+        try:
+            #bytes读取文件
+            bytes_array=self.file_Util.read_file_stream(filepath,100)
 
-        #bytes读取文件
-        bytes_array=self.file_Util.read_file_stream(filepath,100)
+            # 加载公钥
+            rsa_key = RSA.import_key(open("client_public.pem").read() )
 
-        # 加载公钥
-        rsa_key = RSA.import_key(open("client_public.pem").read() )
+            # 分段加密
+            en_bytes_array=[]
+            cipher_rsa = Cipher_PKC.new(rsa_key)
+            for bytes in bytes_array:
+                en_data = cipher_rsa.encrypt(bytes)
+                #print(len(en_data))
+                en_bytes_array.append(en_data)
 
-        # 分段加密
-        en_bytes_array=[]
-        cipher_rsa = Cipher_PKC.new(rsa_key)
-        for bytes in bytes_array:
-            en_data = cipher_rsa.encrypt(bytes)
-            #print(len(en_data))
-            en_bytes_array.append(en_data)
-
-        #写加密后的文件
-        self.file_Util.write_file_stream(filepath,en_bytes_array)
+            #写加密后的文件
+            self.file_Util.write_file_stream(filepath,en_bytes_array)
+            return "s_"
+        except Exception as ex:
+             return self.exception_util.get_exctption_info("encrypt",ex)
+        
 
     # 使用私钥对文件进行rsa 分段解密
     def decrypt(self,filepath):
+        try:
+            #bytes读取文件
+            en_bytes_array=self.file_Util.read_file_stream(filepath,128)
 
-        #bytes读取文件
-        en_bytes_array=self.file_Util.read_file_stream(filepath,128)
+            # 读取私钥
+            private_key = RSA.import_key(open("client_private.pem").read())
 
-        # 读取私钥
-        private_key = RSA.import_key(open("client_private.pem").read())
-
-        # 分段解密
-        bytes_array=[]
-        cipher_rsa = Cipher_PKC.new(private_key)
-        for bytes in en_bytes_array:
-            data = cipher_rsa.decrypt(bytes,None)
-            #print(len(data))
-            bytes_array.append(data)
+            # 分段解密
+            bytes_array=[]
+            cipher_rsa = Cipher_PKC.new(private_key)
+            for bytes in en_bytes_array:
+                data = cipher_rsa.decrypt(bytes,None)
+                #print(len(data))
+                bytes_array.append(data)
         
-        #写解密后的文件
-        self.file_Util.write_file_stream(filepath,bytes_array)
+            #写解密后的文件
+            self.file_Util.write_file_stream(filepath,bytes_array)
+            return "s_"
+        except Exception as ex:
+             return self.exception_util.get_exctption_info("encrypt",ex)
 
 #文件读写类
 class Flie_Util():
      #构造函数
     def __init__(self):
+        self.exception_util=Exception_Util()
         self.s=""
 
     #读文件
@@ -109,9 +121,8 @@ class Flie_Util():
             result = f.read()
             print(result)
             return result
-        except:
-             print("Error")
-             return ""
+        except Exception as ex:
+            return self.exception_util.get_exctption_info("read",ex)
         finally:
             if f:
                 f.close()
@@ -122,20 +133,21 @@ class Flie_Util():
             print(filePath)
             f = open(filePath, 'w')
             f.write(data)
-        except:
-             print("Error in write")
+            f.write(bytes)
+        except Exception as ex:
+             self.exception_util.print_exctption("write",ex)
         finally:
             if f:
                 f.close()
 
     #写字节
-    def writeBytes(self,filePath,bytes):
+    def write_bytes(self,filePath,bytes):
         try:
             print(filePath)
             f = open(filePath, 'wb')
             f.write(bytes)
-        except:
-             print("Error in writeBytes")
+        except Exception as ex:
+             self.exception_util.print_exctption("write_bytes",ex)
         finally:
             if f:
                 f.close()
@@ -152,8 +164,8 @@ class Flie_Util():
                     #print(dt)
                 else:
                     break
-        except:
-             print("Error in read_file_stream")
+        except Exception as ex:
+             self.exception_util.print_exctption("read_file_stream",ex)
         finally:
             if f:
                 f.close()
@@ -164,8 +176,26 @@ class Flie_Util():
         try:
             f= open(filepath, 'wb')
             f.writelines(bytes_array)
-        except:
-             print("Error in write_file_stream")
+        except Exception as ex:
+             self.exception_util.print_exctption("write_file_stream",ex)
         finally:
             if f:
                 f.close()
+
+class Exception_Util():
+     #构造函数
+    def __init__(self):
+        self.s=""
+
+    def print_exctption(self, msg,e):
+        errorstr=self.get_exctption_info(msg,e)
+        print (errorstr)
+
+    def get_exctption_info(self,exStr, e):
+        s='error:\t'
+        s+=(exStr)
+        s+=('\nstr(e):\t')
+        s+=(str(e))
+        s+=('\nrepr(e):\t')
+        s+=(repr(e))
+        return s
