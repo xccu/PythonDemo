@@ -1,6 +1,8 @@
 from tkinter import *
 from tkinter import filedialog
 from rosetta_core import *
+import _thread
+import time
 
 class Init_Window():
     
@@ -8,6 +10,7 @@ class Init_Window():
     def __init__(self,window):
         self.window = window
         self.rsa = RSA_Util()
+        self.enable=True
 
     def init(self):
         #设置窗体title
@@ -63,24 +66,41 @@ class Init_Window():
         #self.log_Text.grid(row=3, column=0,columnspan = 4)
         self.log_Text.place(x=10,y=150)
 
-       
+    
+    
+    def encrypt_click(self):
+        if self.enable:
+            _thread.start_new_thread(self.encrypt_thread,())
+        else:
+            self.log_Text.insert(1.0,'加密程序正在运行中\n')
+
+    def decrypt_click(self):
+        if self.enable:
+            _thread.start_new_thread(self.decrypt_thread,())
+        else:
+            self.log_Text.insert(1.0,'解密程序正在运行中\n')
 
     #加密函数
-    def encrypt_click(self):
+    def encrypt_thread(self):
+        self.enable=False
+        self.log_Text.insert(1.0,'加密中：'+self.filePath+'\n')
         result = self.rsa.encrypt(self.filePath)
         if result=="s_":
             self.log_Text.insert(1.0,'已加密：'+self.filePath+'\n')
         else:
             self.log_Text.insert(1.0,result+'\n')
+        self.enable=True
 
     #解密函数
-    def decrypt_click(self):
+    def decrypt_thread(self):
+        self.enable=False
+        self.log_Text.insert(1.0,'解密中：'+self.filePath+'\n')
         result = self.rsa.decrypt(self.filePath)
         if result=="s_":
             self.log_Text.insert(1.0,'已解密：'+self.filePath+'\n')
         else:
             self.log_Text.insert(1.0,result+'\n')
-
+        self.enable=True
 
     #打开文件函数
     def open_file_click(self):
