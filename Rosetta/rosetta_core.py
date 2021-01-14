@@ -6,6 +6,7 @@ from Crypto.Cipher import PKCS1_v1_5 as Cipher_PKC
 from Crypto import Random
 from Crypto.Hash import SHA256
 from Crypto.Signature import PKCS1_v1_5 as Signature_PKC
+from threading import Thread
 
 #AES加密解密类
 class AES_Util():
@@ -34,10 +35,13 @@ class AES_Util():
 
 #RSA加密解密类
 class RSA_Util():
+
     #构造函数
     def __init__(self):
         self.file_Util = Flie_Util()
         self.exception_util=Exception_Util()
+        self.progress=0
+        #self.progressbar=None
 
     #创建RSA密钥对(公钥+私钥)
     def create_rsa_key(self):
@@ -71,9 +75,12 @@ class RSA_Util():
             # 分段加密
             en_bytes_array=[]
             cipher_rsa = Cipher_PKC.new(rsa_key)
+            i=0
+            self.progress=0
             for bytes in bytes_array:
+                i+=1
+                self.setProgress(i,bytes_array)
                 en_data = cipher_rsa.encrypt(bytes)
-                #print(len(en_data))
                 en_bytes_array.append(en_data)
 
             #写加密后的文件
@@ -95,9 +102,12 @@ class RSA_Util():
             # 分段解密
             bytes_array=[]
             cipher_rsa = Cipher_PKC.new(private_key)
+            i=0
+            self.progress=0
             for bytes in en_bytes_array:
+                i+=1
+                self.setProgress(i,en_bytes_array)
                 data = cipher_rsa.decrypt(bytes,None)
-                #print(len(data))
                 bytes_array.append(data)
         
             #写解密后的文件
@@ -105,6 +115,11 @@ class RSA_Util():
             return "s_"
         except Exception as ex:
              return self.exception_util.get_exctption_info("encrypt",ex)
+        
+    #设置进度
+    def setProgress(self,i,array):
+        self.progress=(int)((i/len(array))*100)
+        print(self.progress)
 
 #文件读写类
 class Flie_Util():
