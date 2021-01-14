@@ -13,6 +13,7 @@ class Init_Window():
         self.rsa = RSA_Util()
         self.enable=True
 
+    #初始化
     def init(self):
         #设置窗体title
         self.window.title('Rosetta')
@@ -68,11 +69,13 @@ class Init_Window():
         #创建进度条
         self.p_bar = ttk.Progressbar(self.container, length = 705, value = 0, mode = "determinate")
         self.p_bar.place(x=10,y=300)
+
+        #设置进度条回调函数
+        self.rsa.callback=self.progress_callback
     
     #加密
     def encrypt_click(self):
         if self.enable:
-            _thread.start_new_thread(self.progress_thread,())
             _thread.start_new_thread(self.encrypt_thread,())
         else:
             self.log_Text.insert(1.0,'加密程序正在运行中\n')
@@ -80,7 +83,6 @@ class Init_Window():
     #解密
     def decrypt_click(self):
         if self.enable:
-            _thread.start_new_thread(self.progress_thread,())
             _thread.start_new_thread(self.decrypt_thread,())
         else:
             self.log_Text.insert(1.0,'解密程序正在运行中\n')
@@ -88,7 +90,6 @@ class Init_Window():
     #加密函数
     def encrypt_thread(self):
         self.enable=False
-        self.log_Text.insert(1.0,'加密中：'+self.filePath+'\n')
         result = self.rsa.encrypt(self.filePath)
         if result=="s_":
             self.log_Text.insert(1.0,'已加密：'+self.filePath+'\n')
@@ -101,7 +102,6 @@ class Init_Window():
     #解密函数
     def decrypt_thread(self):
         self.enable=False
-        self.log_Text.insert(1.0,'解密中：'+self.filePath+'\n')
         result = self.rsa.decrypt(self.filePath)
         if result=="s_":
             self.log_Text.insert(1.0,'已解密：'+self.filePath+'\n')
@@ -110,11 +110,11 @@ class Init_Window():
         self.p_bar["value"]=0
         self.rsa.progress=0
         self.enable=True
-    
-    #进度条显示函数
-    def progress_thread(self):
-        while self.rsa.progress < 100 :
-            self.p_bar["value"]=self.rsa.progress
+
+    #进度条回调函数
+    def progress_callback(self,i):
+        print(i)
+        self.p_bar["value"]=i
 
     #打开文件函数
     def open_file_click(self):
@@ -130,7 +130,7 @@ class Init_Window():
         #data = fileUtil.read(self.filePath)
         #self.init_Text.insert(1.0,data)
 
-    #保存文件函数
+    #生成密钥函数
     def create_keys_click(self):
         self.rsa.create_rsa_key()
         self.log_Text.insert(1.0,'已生成密钥'+'\n')

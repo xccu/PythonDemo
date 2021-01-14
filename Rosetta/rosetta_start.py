@@ -2,7 +2,6 @@
 #from tkinter import *
 from rosetta_gui import *
 
-
 def main():
     # 实例化出一个父窗口
     window = Tk()             

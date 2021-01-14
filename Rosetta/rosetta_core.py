@@ -37,11 +37,11 @@ class AES_Util():
 class RSA_Util():
 
     #构造函数
-    def __init__(self):
+    def __init__(self,callback=None):
         self.file_Util = Flie_Util()
         self.exception_util=Exception_Util()
         self.progress=0
-        #self.progressbar=None
+        self.callback=callback
 
     #创建RSA密钥对(公钥+私钥)
     def create_rsa_key(self):
@@ -114,12 +114,14 @@ class RSA_Util():
             self.file_Util.write_file_stream(filepath,bytes_array)
             return "s_"
         except Exception as ex:
-             return self.exception_util.get_exctption_info("encrypt",ex)
+            return self.exception_util.get_exctption_info("encrypt",ex)
         
     #设置进度
     def setProgress(self,i,array):
         self.progress=(int)((i/len(array))*100)
-        print(self.progress)
+        if self.callback is not None:
+            self.callback(self.progress)
+
 
 #文件读写类
 class Flie_Util():
@@ -204,7 +206,7 @@ class Exception_Util():
 
     def print_exctption(self, msg,e):
         errorstr=self.get_exctption_info(msg,e)
-        print (errorstr)
+        print(errorstr)
 
     def get_exctption_info(self,exStr, e):
         s='error:\t'
