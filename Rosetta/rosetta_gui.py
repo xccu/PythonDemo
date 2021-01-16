@@ -11,6 +11,7 @@ class Init_Window():
     def __init__(self,window):
         self.window = window       
         self.rsa = RSA_Util()
+        self.file_util= Flie_Util()
         self.enable=True
 
     #初始化
@@ -56,81 +57,134 @@ class Init_Window():
         #self.open_file_button.grid(row=2, column=0)
         self.open_file_button.place(x=10,y=100)
 
-        #创建文本框
-        self.file_Text = Text(self.container, width=87, height=2)
+        #选择文件夹按钮
+        self.open_folder_button = Button(self.container, text="选择文件夹", width=10,command=self.open_folder_click) 
+        #self.open_file_button.grid(row=2, column=0)
+        self.open_folder_button.place(x=100,y=100)
+
+        #创建路径文本框
+        self.file_Text = Text(self.container, width=85, height=2)
         #self.file_Text.grid(row=2, column=1,columnspan = 3)
-        self.file_Text.place(x=100,y=100)
+        self.file_Text.place(x=190,y=100)
 
         #创建日志文本框
-        self.log_Text = Text(self.container, width=100, height=10)
+        self.log_Text = Text(self.container, width=111, height=15)
         #self.log_Text.grid(row=3, column=0,columnspan = 4)
         self.log_Text.place(x=10,y=150)
 
         #创建进度条
-        self.p_bar = ttk.Progressbar(self.container, length = 705, value = 0, mode = "determinate")
-        self.p_bar.place(x=10,y=300)
+        self.p_bar = ttk.Progressbar(self.container, length = 780, value = 0, mode = "determinate")
+        self.p_bar.place(x=10,y=360)
 
         #设置进度条回调函数
         self.rsa.callback=self.progress_callback
     
-    #加密
+    #加密按钮响应函数
     def encrypt_click(self):
         if self.enable:
-            _thread.start_new_thread(self.encrypt_thread,())
+            result=self.file_util.judge_path(self.filePath)
+            if result==0:
+                _thread.start_new_thread(self.encrypt_folder_thread,())
+            elif result==1:
+                print("加密文件")
+                _thread.start_new_thread(self.encrypt_thread,())
+            else :
+                self.log_Text.insert(1.0,'未能识别文件或文件夹\n')
         else:
             self.log_Text.insert(1.0,'加密程序正在运行中\n')
 
-    #解密
+    #解密按钮响应函数
     def decrypt_click(self):
         if self.enable:
-            _thread.start_new_thread(self.decrypt_thread,())
+            result=self.file_util.judge_path(self.filePath)
+            if result==0:
+                _thread.start_new_thread(self.decrypt_folder_thread,())
+            elif result==1:
+                _thread.start_new_thread(self.decrypt_thread,())
+            else :
+                self.log_Text.insert(1.0,'未能识别文件或文件夹\n')
         else:
             self.log_Text.insert(1.0,'解密程序正在运行中\n')
             
-    #加密函数
+    #文件加密线程函数
     def encrypt_thread(self):
         self.enable=False
-        result = self.rsa.encrypt(self.filePath)
-        if result=="s_":
-            self.log_Text.insert(1.0,'已加密：'+self.filePath+'\n')
-        else:
-            self.log_Text.insert(1.0,result+'\n')
+        self.encrypt(self.filePath)
+        self.p_bar["value"]=0
+        self.rsa.progress=0
+        self.enable=True
+    
+    #文件夹加密线程函数
+    def encrypt_folder_thread(self):
+        self.enable=False
+        flie_list=self.file_util.foreach_folder(self.filePath)
+        for file_name in flie_list:
+            self.encrypt(file_name)
+        self.log_Text.insert(1.0,'已加密：'+self.filePath+'\n')
         self.p_bar["value"]=0
         self.rsa.progress=0
         self.enable=True
 
-    #解密函数
+    #加密
+    def encrypt(self,filePath):
+        result = self.rsa.encrypt(filePath)
+        if result=="s_":
+            self.log_Text.insert(1.0,'已加密：'+filePath+'\n')
+        else:
+            self.log_Text.insert(1.0,result+'\n')
+
+    #文件解密线程函数
     def decrypt_thread(self):
         self.enable=False
-        result = self.rsa.decrypt(self.filePath)
-        if result=="s_":
-            self.log_Text.insert(1.0,'已解密：'+self.filePath+'\n')
-        else:
-            self.log_Text.insert(1.0,result+'\n')
+        self.decrypt(self.filePath)
+        self.p_bar["value"]=0
+        self.rsa.progress=0
+        self.enable=True
+    
+    #文件夹解密线程函数
+    def decrypt_folder_thread(self):
+        self.enable=False
+        flie_list=self.file_util.foreach_folder(self.filePath)
+        for file_name in flie_list:
+            self.decrypt(file_name)
+        self.log_Text.insert(1.0,'已解密：'+self.filePath+'\n')
         self.p_bar["value"]=0
         self.rsa.progress=0
         self.enable=True
 
-    #进度条回调函数
-    def progress_callback(self,i):
-        print(i)
-        self.p_bar["value"]=i
-
+    #解密
+    def decrypt(self,filePath):
+        result = self.rsa.decrypt(filePath)
+        if result=="s_":
+            self.log_Text.insert(1.0,'已解密：'+filePath+'\n')
+        else:
+            self.log_Text.insert(1.0,result+'\n')
+    
     #打开文件函数
     def open_file_click(self):
         #self.window.withdraw()
-
         # 清空文本控件
         self.file_Text.delete('1.0','end')
         # 选择文件
         self.filePath = filedialog.askopenfilename()
         # 显示文件路径
         self.file_Text.insert(1.0,self.filePath)
-        #fileUtil=Flie_Util()
-        #data = fileUtil.read(self.filePath)
-        #self.init_Text.insert(1.0,data)
+
+    #打开文件夹函数
+    def open_folder_click(self):
+        # 清空文本控件
+        self.file_Text.delete('1.0','end')
+        # 选择文件夹
+        self.filePath = filedialog.askdirectory()
+        # 显示文件夹路径
+        self.file_Text.insert(1.0,self.filePath)
 
     #生成密钥函数
     def create_keys_click(self):
         self.rsa.create_rsa_key()
         self.log_Text.insert(1.0,'已生成密钥'+'\n')
+
+    #进度条回调函数
+    def progress_callback(self,i):
+        #print(i)
+        self.p_bar["value"]=i

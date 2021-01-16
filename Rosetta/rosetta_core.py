@@ -1,6 +1,7 @@
 from Crypto.Cipher import AES
 from Crypto import Random
 import base64
+import os
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_v1_5 as Cipher_PKC
 from Crypto import Random
@@ -125,7 +126,7 @@ class RSA_Util():
 
 #文件读写类
 class Flie_Util():
-     #构造函数
+    #构造函数
     def __init__(self):
         self.exception_util=Exception_Util()
         self.s=""
@@ -198,6 +199,28 @@ class Flie_Util():
         finally:
             if f:
                 f.close()
+    
+    #遍历指定文件夹中所有文件
+    def foreach_folder(self,path):
+        filelist=[]
+        for root,dirs,files in os.walk(path):
+            for name in files:
+                path = os.path.join(root,name)
+                filelist.append(path)
+                print(path)
+        return filelist
+    
+    def judge_path(self,path):
+        if os.path.isdir(path):     #文件夹返回0
+            print("文件夹"+path)
+            return 0
+        elif os.path.isfile(path):  #文件返回1
+            print("文件"+path)
+            return 1
+        else:
+            print("未识别"+path)
+            return -1
+ 
 
 class Exception_Util():
      #构造函数
