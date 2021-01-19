@@ -22,8 +22,11 @@ class Init_Window():
         self.window.geometry("800x450")
         #self.window.grid(width=80, height=50)
 
+        #固定宽高，防止用户调整尺寸
+        self.window.resizable(0,0) 
+
         #self.window.toolbar = Frame(self.window, borderwidth=0)
-        self.container = Frame(self.window, relief="sunken", width=800, height=450)
+        self.container = Frame(self.window, relief="sunken", width=800, height=430)
         self.container.pack()
         self.container.grid_propagate(False)
 
@@ -76,6 +79,14 @@ class Init_Window():
         self.p_bar = ttk.Progressbar(self.container, length = 780, value = 0, mode = "determinate")
         self.p_bar.place(x=10,y=360)
 
+        #底部状态栏:信息 
+        self.status_bar = Label(self.window, text="就绪", bd=1, relief=SUNKEN,anchor=W,width=100)
+        self.status_bar.pack(side=LEFT)
+
+        #底部状态栏:计数 
+        self.status_count_bar = Label(self.window, text="", bd=1, relief=SUNKEN,anchor=W)
+        self.status_count_bar.pack(side=BOTTOM, fill=X)
+
         #设置进度条回调函数
         self.rsa.callback=self.progress_callback
     
@@ -109,21 +120,24 @@ class Init_Window():
     #文件加密线程函数
     def encrypt_thread(self):
         self.enable=False
+        self.status_bar["text"] = '加密中：{0}'.format(self.filePath)
+        self.status_count_bar["text"] = '1/1'
         self.encrypt(self.filePath)
-        self.p_bar["value"]=0
-        self.rsa.progress=0
-        self.enable=True
+        self.reset_control()
     
     #文件夹加密线程函数
     def encrypt_folder_thread(self):
         self.enable=False
         flie_list=self.file_util.foreach_folder(self.filePath)
+        i=0
+        count = len(flie_list)
         for file_name in flie_list:
+            i+=1
+            self.status_bar["text"] = '加密中：{0}'.format(file_name)
+            self.status_count_bar["text"] = '{0}/{1}'.format(i,count)
             self.encrypt(file_name)
         self.log_Text.insert(1.0,'已加密：'+self.filePath+'\n')
-        self.p_bar["value"]=0
-        self.rsa.progress=0
-        self.enable=True
+        self.reset_control()
 
     #加密
     def encrypt(self,filePath):
@@ -136,21 +150,24 @@ class Init_Window():
     #文件解密线程函数
     def decrypt_thread(self):
         self.enable=False
+        self.status_bar["text"] = '解密中：{0}'.format(self.filePath)
+        self.status_count_bar["text"] = '1/1'
         self.decrypt(self.filePath)
-        self.p_bar["value"]=0
-        self.rsa.progress=0
-        self.enable=True
+        self.reset_control()
     
     #文件夹解密线程函数
     def decrypt_folder_thread(self):
         self.enable=False
         flie_list=self.file_util.foreach_folder(self.filePath)
+        i=0
+        count = len(flie_list)
         for file_name in flie_list:
+            i+=1
+            self.status_bar["text"] = '解密中：{0}'.format(file_name)
+            self.status_count_bar["text"] = '{0}/{1}'.format(i,count)
             self.decrypt(file_name)
         self.log_Text.insert(1.0,'已解密：'+self.filePath+'\n')
-        self.p_bar["value"]=0
-        self.rsa.progress=0
-        self.enable=True
+        self.reset_control()
 
     #解密
     def decrypt(self,filePath):
@@ -188,3 +205,11 @@ class Init_Window():
     def progress_callback(self,i):
         #print(i)
         self.p_bar["value"]=i
+
+    #控件复位函数
+    def reset_control(self):
+        self.status_bar["text"] = '就绪'
+        self.status_count_bar["text"] = ''
+        self.p_bar["value"]=0
+        self.rsa.progress=0
+        self.enable=True
