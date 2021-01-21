@@ -40,7 +40,8 @@ class Init_Window():
 
         #加密按钮
         #self.encrypt_button = Button(self.container, text="加密", width=10,command=self.encrypt_click)  # 调用内部方法  加()为直接调用
-        self.encrypt_button = Button_PX(self.container, text="加密", width=80,command=self.encrypt_click)
+        #self.encrypt_button = Button_PX(self.container, text="加密", width=30,height=30,image="img/encrypt-m.png", command=self.encrypt_click)
+        self.encrypt_button = Button_PX(self.container, text="加密", width=80,height=30,command=self.encrypt_click)
         self.encrypt_button.place(x=10,y=50)
 
         #解密按钮
