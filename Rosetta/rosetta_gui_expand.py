@@ -88,6 +88,8 @@ class Button_PX():
         self.frame.pack_propagate(0)
 
         self.button = Button(self.frame)
+        
+        self.button["relief"] = get_value("relief",kw)
         self.button["text"] =get_value("text",kw)
         self.button["width"] = self.width
         self.button["height"] = self.height

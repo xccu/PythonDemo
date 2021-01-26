@@ -11,7 +11,7 @@ class Init_Window():
     #构造函数
     def __init__(self,window):
         self.window = window       
-        self.encryptor = RSA_Encryptor()
+        self.encryptor = AES_Encryptor()
         self.file_util= Flie_Util()
         self.enable=True
 
@@ -56,6 +56,10 @@ class Init_Window():
         self.import_key_button = Button_PX(self.container, text="导入私钥", width=80)  
         self.import_key_button.place(x=280,y=50)
 
+        #清空日志按钮
+        self.import_key_button = Button_PX(self.container, text="清空日志", width=80,command=self.clear_log_click)  
+        self.import_key_button.place(x=370,y=50)
+
         #选择文件按钮
         self.open_file_button = Button_PX(self.container, text="选择文件", width=80,command=self.open_file_click) 
         self.open_file_button.place(x=10,y=100)
@@ -86,7 +90,7 @@ class Init_Window():
         self.status_count_bar.pack(side=BOTTOM, fill=X)
 
         #设置进度条回调函数
-        self.encryptor.callback=self.progress_callback
+        self.encryptor.progress_func=self.progress_callback
     
     #加密按钮响应函数
     def encrypt_click(self):
@@ -198,6 +202,10 @@ class Init_Window():
     def create_keys_click(self):
         self.encryptor.create_key()
         self.log_Text.insert(1.0,'已生成密钥'+'\n')
+
+    #清空日志函数
+    def clear_log_click(self):
+        self.log_Text.delete('1.0','end')
 
     #进度条回调函数
     def progress_callback(self,i):
