@@ -11,7 +11,7 @@ class Init_Window():
     #构造函数
     def __init__(self,window):
         self.window = window       
-        self.rsa = RSA_Util()
+        self.encryptor = RSA_Encryptor()
         self.file_util= Flie_Util()
         self.enable=True
 
@@ -86,7 +86,7 @@ class Init_Window():
         self.status_count_bar.pack(side=BOTTOM, fill=X)
 
         #设置进度条回调函数
-        self.rsa.callback=self.progress_callback
+        self.encryptor.callback=self.progress_callback
     
     #加密按钮响应函数
     def encrypt_click(self):
@@ -139,7 +139,7 @@ class Init_Window():
 
     #加密
     def encrypt(self,filePath):
-        result = self.rsa.encrypt(filePath)
+        result = self.encryptor.encrypt(filePath)
         if result=="s_":
             self.log_Text.insert(1.0,'已加密：'+filePath+'\n')
         else:
@@ -169,7 +169,7 @@ class Init_Window():
 
     #解密
     def decrypt(self,filePath):
-        result = self.rsa.decrypt(filePath)
+        result = self.encryptor.decrypt(filePath)
         if result=="s_":
             self.log_Text.insert(1.0,'已解密：'+filePath+'\n')
         else:
@@ -196,7 +196,7 @@ class Init_Window():
 
     #生成密钥函数
     def create_keys_click(self):
-        self.rsa.create_rsa_key()
+        self.encryptor.create_key()
         self.log_Text.insert(1.0,'已生成密钥'+'\n')
 
     #进度条回调函数
@@ -209,5 +209,5 @@ class Init_Window():
         self.status_bar["text"] = '就绪'
         self.status_count_bar["text"] = ''
         self.p_bar["value"]=0
-        self.rsa.progress=0
+        self.encryptor.progress=0
         self.enable=True

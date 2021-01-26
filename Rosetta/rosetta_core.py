@@ -2,6 +2,7 @@ from Crypto.Cipher import AES
 from Crypto import Random
 import base64
 import os
+from rosetta_interface import *
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_v1_5 as Cipher_PKC
 from Crypto import Random
@@ -10,32 +11,82 @@ from Crypto.Signature import PKCS1_v1_5 as Signature_PKC
 from threading import Thread
 
 #AES加密解密类
-class AES_Util():
+class AES_Encryptor(IEncryptor):
      #构造函数
-    def __init__(self):
-        # 密钥key必须为 16（AES-128）， 24（AES-192）， 32（AES-256）
+    def __init__(self,callback=None):
+        self.file_Util = Flie_Util()
+        self.exception_util=Exception_Util()
+        self.progress=0
+        self.callback=callback
+         # 密钥key必须为 16（AES-128）， 24（AES-192）， 32（AES-256）
         self.key = b'this is a 16 key'
-        
-    def encrypt(self,dataStr):
         # 生成长度等于AES 块大小的不可重复的密钥向量
         self.iv = Random.new().read(AES.block_size)
-        # 使用 key 和iv 初始化AES 对象， 使用MODE_CFB模式
-        self.mycipher = AES.new(self.key, AES.MODE_CFB, self.iv)
-        # 将iv(密钥向量)加到加密的密钥开头， 一起返回
-        ciptext =self.iv + self.mycipher.encrypt(dataStr.encode())
-        print(ciptext)
-        return ciptext
 
-    def decrypt(self,ciptext):
-        # 解密需要用key 和iv 生成的AES对象
-        mydecrypt = AES.new(self.key, AES.MODE_CFB, ciptext[:16])
-        # 使用新生成的AES 对象， 将加密的密钥解密
-        text = mydecrypt.decrypt(ciptext[16:]).decode()
-        print(text)
-        return text
+    #生成密钥
+    def create_key(self): 
+        # 密钥key必须为 16（AES-128）， 24（AES-192）， 32（AES-256）
+        self.key = b'this is a 16 key'
+        # 生成长度等于AES 块大小的不可重复的密钥向量
+        self.iv = Random.new().read(AES.block_size)
+        
+    #加密
+    def encrypt(self,filepath):
+        try:
+            #bytes读取文件
+            bytes_array=self.file_Util.read_file_stream(filepath,2048)
+            # 使用 key 和iv 初始化AES 对象， 使用MODE_CFB模式
+            self.mycipher = AES.new(self.key, AES.MODE_CFB, self.iv)
+
+            # 分段加密
+            en_bytes_array=[]
+            i=0
+            self.progress=0
+            for bytes in bytes_array:
+                i+=1
+                self.setProgress(i,bytes_array)
+                en_data = self.mycipher.encrypt(bytes)
+                en_bytes_array.append(en_data)
+
+            #写加密后的文件
+            self.file_Util.write_file_stream(filepath,en_bytes_array)
+
+            return "s_"
+        except Exception as ex:
+            return self.exception_util.print_exctption("encrypt",ex)
+
+    #解密
+    def decrypt(self,filepath):
+        try:
+            #bytes读取文件
+            en_bytes_array=self.file_Util.read_file_stream(filepath,2048)
+            # 解密需要用key 和iv 生成的AES对象
+            mydecrypt = AES.new(self.key, AES.MODE_CFB, self.iv)
+
+            # 分段解密
+            bytes_array=[]
+            i=0
+            self.progress=0
+            for bytes in en_bytes_array:
+                i+=1
+                self.setProgress(i,en_bytes_array)
+                data = mydecrypt.decrypt(bytes)
+                bytes_array.append(data)
+        
+            #写解密后的文件
+            self.file_Util.write_file_stream(filepath,bytes_array)
+            return "s_"
+        except Exception as ex:
+            return self.exception_util.get_exctption_info("decrypt",ex)
+    
+    #设置进度
+    def setProgress(self,i,array):
+        self.progress=(int)((i/len(array))*100)
+        if self.callback is not None:
+            self.callback(self.progress)
 
 #RSA加密解密类
-class RSA_Util():
+class RSA_Encryptor(IEncryptor):
 
     #构造函数
     def __init__(self,callback=None):
@@ -45,7 +96,7 @@ class RSA_Util():
         self.callback=callback
 
     #创建RSA密钥对(公钥+私钥)
-    def create_rsa_key(self):
+    def create_key(self):
         try:
             # 伪随机数生成器
             random_gen = Random.new().read
@@ -115,7 +166,7 @@ class RSA_Util():
             self.file_Util.write_file_stream(filepath,bytes_array)
             return "s_"
         except Exception as ex:
-            return self.exception_util.get_exctption_info("encrypt",ex)
+            return self.exception_util.get_exctption_info("decrypt",ex)
         
     #设置进度
     def setProgress(self,i,array):
