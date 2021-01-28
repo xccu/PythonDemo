@@ -13,6 +13,11 @@ import string
 from time import *
 from rosetta_util import *
 
+aes_key_path="keys/aes_key.pem"
+aes_iv_path="keys/aes_iv.pem"
+rsa_public_path="keys/rsa_public.pem"
+rsa_private_path="keys/rsa_private.pem"
+
 #AES加密解密类
 class AES_Encryptor(IEncryptor):
      #构造函数
@@ -39,11 +44,11 @@ class AES_Encryptor(IEncryptor):
             # 密钥key必须为 16（AES-128）， 24（AES-192）， 32（AES-256）
             str_list = [random.choice(string.digits + string.ascii_letters) for i in range(16)]
             key = ''.join(str_list).encode()
-            with open("aes_key.pem", "wb") as f:
+            with open(aes_key_path, "wb") as f:
                 f.write(key)
             # 生成长度等于AES 块大小的不可重复的密钥向量
             iv = Random.new().read(AES.key_size[0])
-            with open("aes_iv.pem", "wb") as f:
+            with open(aes_iv_path, "wb") as f:
                 f.write(iv)
             return "s_"
         except Exception as ex:
@@ -57,10 +62,10 @@ class AES_Encryptor(IEncryptor):
             bytes_array=self.file_Util.read_file_stream(filepath,2048)
 
             # 加载密钥和向量
-            with open("aes_key.pem", "rb") as f:
+            with open(aes_key_path, "rb") as f:
                 key = f.read()
                 print(key)           
-            with open("aes_iv.pem", "rb") as f:
+            with open(aes_iv_path, "rb") as f:
                 iv = f.read()
 
             # 使用 key 和iv 初始化AES 对象， 使用MODE_CFB模式
@@ -90,9 +95,9 @@ class AES_Encryptor(IEncryptor):
             en_bytes_array=self.file_Util.read_file_stream(filepath,2048)
 
             # 加载密钥和向量
-            with open("aes_key.pem", "rb") as f:
+            with open(aes_key_path, "rb") as f:
                 key = f.read()
-            with open("aes_iv.pem", "rb") as f:
+            with open(aes_iv_path, "rb") as f:
                 iv = f.read()
 
             # 解密需要用key 和iv 生成的AES对象
@@ -159,11 +164,11 @@ class RSA_Encryptor(IEncryptor):
 
             # 秘钥对的生成
             private_pem = rsa.exportKey()
-            with open("rsa_private.pem", "wb") as f:
+            with open(rsa_private_path, "wb") as f:
                 f.write(private_pem)
 
             public_pem = rsa.publickey().exportKey()
-            with open("rsa_public.pem", "wb") as f:
+            with open(rsa_public_path, "wb") as f:
                 f.write(public_pem)
             return "s_"
         except Exception as ex:
@@ -201,7 +206,7 @@ class RSA_Encryptor(IEncryptor):
         self.log_func('单线程')
 
         # 加载公钥
-        public_key = RSA.import_key(open("rsa_public.pem").read() )
+        public_key = RSA.import_key(open(rsa_public_path).read() )
         
         # 分段加密
         en_bytes_array=[]
@@ -222,7 +227,7 @@ class RSA_Encryptor(IEncryptor):
         self.log_func('多线程')
 
         # 加载公钥
-        public_key = RSA.import_key(open("rsa_public.pem").read() )
+        public_key = RSA.import_key(open(rsa_public_path).read() )
 
         self.pro_num=0
         self.progress=0
@@ -287,7 +292,7 @@ class RSA_Encryptor(IEncryptor):
         self.log_func('单线程')
 
         # 读取私钥
-        private_key = RSA.import_key(open("rsa_private.pem").read())
+        private_key = RSA.import_key(open(rsa_private_path).read())
 
         # 分段解密
         bytes_array=[]
@@ -308,7 +313,7 @@ class RSA_Encryptor(IEncryptor):
         self.log_func('多线程')
 
         # 读取私钥
-        private_key = RSA.import_key(open("rsa_private.pem").read())
+        private_key = RSA.import_key(open(rsa_private_path).read())
 
         self.pro_num=0
         self.progress=0

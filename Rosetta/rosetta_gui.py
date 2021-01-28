@@ -1,19 +1,24 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog
+from rosetta_config import *
 from rosetta_encryptor import *
 from rosetta_util import *
 from rosetta_gui_expand import *
 import _thread
 import time
 
+
 class Init_Window():
     
     #构造函数
     def __init__(self,window):
-        self.window = window       
+        self.window = window    
+        self.config = Config()
+        encrypt_str="{0}_Encryptor".format( self.config.get_option("Encrypt","type"))
+        print(encrypt_str) 
         #通过类名反射获取encryptor
-        self.encryptor = globals()["RSA_Encryptor"]()
+        self.encryptor = globals()[encrypt_str]()
         self.file_util= Flie_Util()
         self.enable=True
 
