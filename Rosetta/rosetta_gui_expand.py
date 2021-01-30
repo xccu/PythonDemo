@@ -75,11 +75,11 @@ class Button_PX():
             self.img = None
         else:
             self.img = PhotoImage(file=self.img_path)
-            self.img.width=30
-            self.img.height=30
+            self.img.width=25
+            self.img.height=25
 
         if self.width is None : self.width=80
-        if self.height is None : self.height=30
+        if self.height is None : self.height=25
 
         self.frame = Frame(root)
         self.frame["width"] = self.width
@@ -94,6 +94,7 @@ class Button_PX():
         self.button["width"] = self.width
         self.button["height"] = self.height
         self.button["image"] = self.img
+        self.button["bd"] = get_value("bd",kw)
         self.button["bg"] = get_value("bg",kw)
         self.button["fg"] = get_value("fg",kw)
         self.button["font"] = get_value("font",kw)

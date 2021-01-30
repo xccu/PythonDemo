@@ -47,17 +47,16 @@ class Init_Window():
 
         #加密按钮
         #self.encrypt_button = Button(self.container, text="加密", width=10,command=self.encrypt_click)  # 调用内部方法  加()为直接调用
-        #self.encrypt_button = Button_PX(self.container, text="加密", width=30,height=30,image="img/encrypt-m.png", command=self.encrypt_click)
-        self.encrypt_button = Button_PX(self.container, text="加密", width=80,height=30,command=self.encrypt_click)
+        self.encrypt_button = Button_PX(self.container, text="加密", width=23,height = 23,image="img/encrypt.png", relief = "solid",bd = 1,command=self.encrypt_click)
         self.encrypt_button.place(x=10,y=50)
 
         #解密按钮
-        self.decrypt_button = Button_PX(self.container, text="解密", width=80,command=self.decrypt_click) 
-        self.decrypt_button.place(x=100,y=50)
+        self.decrypt_button = Button_PX(self.container, text="解密", width=23,height = 23,image="img/decrypt.png", relief = "solid",bd = 1, command=self.decrypt_click) 
+        self.decrypt_button.place(x=35,y=50)
 
         #生成密钥按钮
-        self.create_key_button = Button_PX(self.container, text="生成密钥", width=80,command=self.create_keys_click) 
-        self.create_key_button.place(x=190,y=50)
+        self.create_key_button = Button_PX(self.container, text="生成密钥",width=23,height = 23,image="img/create-key.png", relief = "solid",bd = 1, command=self.create_keys_click) 
+        self.create_key_button.place(x=60,y=50)
 
         #导入私钥按钮
         self.import_key_button = Button_PX(self.container, text="导入私钥", width=80)  
@@ -76,7 +75,7 @@ class Init_Window():
         self.open_folder_button.place(x=100,y=100)
 
         #创建路径文本框
-        self.file_Text = Text_PX(self.container, width=600, height=30)
+        self.file_Text = Text_PX(self.container, width=600, height=25)
         self.file_Text.place(x=190,y=100)
 
         #创建日志文本框

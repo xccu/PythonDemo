@@ -13,10 +13,8 @@ class Flie_Util():
     #读文件
     def read(self,filePath):
         try:
-            print(filePath)
             f = open(filePath, 'r')
             result = f.read()
-            print(result)
             return result
         except Exception as ex:
             return self.exception_util.get_exctption_info("read",ex)
@@ -27,7 +25,6 @@ class Flie_Util():
     #写文件
     def write(self,filePath,data):
         try:
-            print(filePath)
             f = open(filePath, 'w')
             f.write(data)
             f.write(bytes)
@@ -40,7 +37,6 @@ class Flie_Util():
     #写字节
     def write_bytes(self,filePath,bytes):
         try:
-            print(filePath)
             f = open(filePath, 'wb')
             f.write(bytes)
         except Exception as ex:

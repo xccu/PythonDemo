@@ -14,7 +14,6 @@ from time import *
 from rosetta_util import *
 
 aes_key_path="keys/aes_key.pem"
-aes_iv_path="keys/aes_iv.pem"
 rsa_public_path="keys/rsa_public.pem"
 rsa_private_path="keys/rsa_private.pem"
 
@@ -42,18 +41,14 @@ class AES_Encryptor(IEncryptor):
     def create_key(self): 
         try:
             # 密钥key必须为 16（AES-128）， 24（AES-192）， 32（AES-256）
-            str_list = [random.choice(string.digits + string.ascii_letters) for i in range(16)]
-            key = ''.join(str_list).encode()
+            # 32位随机字符串：密钥key+长度等于AES 块大小的不可重复的密钥向量
+            key_list = [random.choice(string.digits + string.ascii_letters) for i in range(32)]
+            key = ''.join(key_list).encode()
             with open(aes_key_path, "wb") as f:
                 f.write(key)
-            # 生成长度等于AES 块大小的不可重复的密钥向量
-            iv = Random.new().read(AES.key_size[0])
-            with open(aes_iv_path, "wb") as f:
-                f.write(iv)
             return "s_"
         except Exception as ex:
             return self.exception_util.print_exctption("create_key",ex)
-
         
     #加密
     def encrypt(self,filepath):
@@ -63,10 +58,9 @@ class AES_Encryptor(IEncryptor):
 
             # 加载密钥和向量
             with open(aes_key_path, "rb") as f:
-                key = f.read()
-                print(key)           
-            with open(aes_iv_path, "rb") as f:
-                iv = f.read()
+                key_str = f.read()
+                key = key_str[0:16]
+                iv = key_str[16:]
 
             # 使用 key 和iv 初始化AES 对象， 使用MODE_CFB模式
             self.mycipher = AES.new(key, AES.MODE_CFB, iv)
@@ -96,9 +90,9 @@ class AES_Encryptor(IEncryptor):
 
             # 加载密钥和向量
             with open(aes_key_path, "rb") as f:
-                key = f.read()
-            with open(aes_iv_path, "rb") as f:
-                iv = f.read()
+                key_str = f.read()
+                key = key_str[0:16]
+                iv = key_str[16:]
 
             # 解密需要用key 和iv 生成的AES对象
             mydecrypt = AES.new(key, AES.MODE_CFB, iv)
