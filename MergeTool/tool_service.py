@@ -1,22 +1,45 @@
 import os
+import os.path 
+import shutil
 
-filelist=[]
-#for root,dirs,files in os.walk('dir'):
-#    for name in files:
-#        path = os.path.join(root,name)
-#        filelist.append(path)
-#        print(path)
-#dir\非人哉 第81集_1080P在线观看平台_腾讯视频 (1)
+class File_Service():
+    def __init__(self):
+        self.file_list =[]
 
-for i in range(1,29):
-    filelist.append('C:\\Users\\ASUS\\Desktop\\MergeTool\\dir\\{0}.ts'.format(str(i)))
-    #print(name)
-#for file in filelist:
-#    tmp.append(file.replace("\n",""))
-    # 合并ts文件
-os.chdir("ts/")
-shell_str = '+'.join(filelist)
-print("cmd")
-shell_str = 'copy /b '+ shell_str + ' 5.mp4' #该命令不支持中文
-os.system(shell_str)
-print(shell_str)
+    def get_file_expand_name(self,file_name):
+        return os.path.splitext(file_name)[1] 
+
+    def copy_file(self,source_file,target_file):
+        #print(source_file+' to '+target_file)
+        shutil.copyfile(source_file, target_file)
+
+    def create_dir_not_exist(self,path):
+        if not os.path.exists(path):
+            os.mkdir(path)
+    
+    def delete_file(self,path):
+        for i in os.listdir(path) :# os.listdir(path)#返回一个列表，里面是当前目录下面的所有东西的相对路径
+            file_data = path + i#当前文件夹的下面的所有东西的绝对路径
+            if os.path.isfile(file_data) == True:#os.path.isfile判断是否为文件,如果是文件,就删除.如果是文件夹.递归给del_file.
+                os.remove(file_data)
+                print('删除临时文件'+file_data)
+            else:
+                self.delete_file(file_data)
+
+
+
+
+class Merge_Service():
+    def __init__(self,output_path):
+        self.output_path = output_path
+    
+    def merge(self,pathlist):
+        print(pathlist)
+        os.chdir("ts/")
+        #os.chdir(self.output_path)
+        self.shell_str = '+'.join(pathlist)
+        self.shell_str = self.shell_str.replace('/','\\')
+        print("cmd")
+        self.shell_str = 'copy /b '+ self.shell_str + ' 5.mp4' #该命令不支持中文
+        os.system(self.shell_str)
+        print(self.shell_str)

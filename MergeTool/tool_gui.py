@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog
 from tool_gui_expand import *
+from tool_service import *
 import os
 
 class Init_Window():
@@ -9,8 +10,14 @@ class Init_Window():
     #构造函数
     def __init__(self,window):
         self.window = window   
+       
 
-        self.pathList = []
+        self.temp_path = 'd:\\target\\temp\\'   #临时文件夹
+        self.output_path='d:\\target\\output\\' #导出文件夹
+
+        self.file_service= File_Service()
+        self.merge_service = Merge_Service(self.output_path)
+    
         #self.config = Config()
         #encrypt_str="{0}_Encryptor".format( self.config.get_option("Encrypt","type"))
         #print(encrypt_str) 
@@ -19,10 +26,11 @@ class Init_Window():
         #self.file_util= Flie_Util()
         self.enable=True
 
+
     #初始化
     def init(self):
         #设置窗体title
-        self.window.title('Rosetta')
+        self.window.title('文件合并工具')
         #设置窗体宽高
         self.window.geometry("800x450")
         #self.window.grid(width=80, height=50)
@@ -36,10 +44,7 @@ class Init_Window():
         #self.container.grid_propagate(False)
 
         #创建标签Label:默认的width, heigth表示字符个数和行数
-        #self.init_Label=Label(self.container,text="加密解密工具",bg='white',height=1,width=10)
-        ##self.init_Label.grid(row=0, column=0)
-        #self.init_Label.place(x=10,y=10)
-        self.init_Label = Label_PX(self.container,text="加密解密工具",width=200,height=20,bg="white")
+        self.init_Label = Label_PX(self.container,text="文件合并",width=200,height=20,bg="white")
         self.init_Label.place(x=10,y=10)
 
         #加密按钮
@@ -65,28 +70,20 @@ class Init_Window():
 
         #选择文件按钮
         self.open_file_button = Button_PX(self.container, text="选择文件", width=80,command=self.open_file_click) 
-        self.open_file_button.place(x=10,y=100)
+        self.open_file_button.place(x=10,y=80)
 
         #选择文件夹按钮
-        self.open_folder_button = Button_PX(self.container, text="选择文件夹", width=80,command=self.open_folder_click) 
-        self.open_folder_button.place(x=100,y=100)
+        self.open_folder_button = Button_PX(self.container, text="测试", width=80,command=self.open_folder_click) 
+        self.open_folder_button.place(x=100,y=80)
 
         #创建路径文本框
         self.file_Text = Text_PX(self.container, width=600, height=25)
-        self.file_Text.place(x=190,y=100)
+        self.file_Text.place(x=190,y=80)
 
+        # 创建列表组件
+        self.file_Listbox  = Listbox(self.container,height=15,width=110)          
+        self.file_Listbox.place(x=10,y=130)
 
-
-        #创建日志文本框
-        #self.log_Text = Text(self.container, width=111, height=15)
-        #self.log_Text = Text_PX(self.container, width=780, height=200)
-        #self.log_Text.place(x=10,y=150)
-
-        self.file_Listbox  = Listbox(self.container,height=10,width=150)          #  创建两个列表组件
-        self.file_Listbox.place(x=10,y=150)
-
-        #for item in self.li:                 # 第一个小部件插入数据
-        #    self.file_Listbox.insert(0,item)
 
         #创建进度条
         #self.p_bar = ttk.Progressbar(self.container, length = 780, value = 0, mode = "determinate")
@@ -109,33 +106,26 @@ class Init_Window():
         # 清空文本控件
         self.file_Text.delete('1.0','end')
         # 选择文件
-        #self.filePath = filedialog.askopenfilename()
-        
-        self.pathList =filedialog.askopenfilenames()
-        for file in self.pathList:   
+        p_List =filedialog.askopenfilenames()
+        #文件列表写入给file_Listbox控件
+        for file in p_List:   
             self.file_Listbox.insert(END,file)
 
-        self.pathlist = self.file_Listbox.get(0,END)
-       
-        #self.merge(self.e2)
-        # 显示文件路径
-        #self.file_Text.insert(1.0,self.filePath)
-
-    #打开文件夹函数
+    #测试函数
     def open_folder_click(self):
-        # 清空文本控件
-        self.file_Text.delete('1.0','end')
-        # 选择文件夹
-        self.filePath = filedialog.askdirectory()
-        # 显示文件夹路径
-        self.file_Text.insert(1.0,self.filePath)
+         #os.remove('d:\\target\\temp\\1.ts')
+         print('test')
 
     def merge_click(self):
-        print(self.pathlist)
-        os.chdir("ts/")
-        self.shell_str = '+'.join(self.pathlist)
-        self.shell_str = self.shell_str.replace('/','\\')
-        print("cmd")
-        self.shell_str = 'copy /b '+ self.shell_str + ' 5.mp4' #该命令不支持中文
-        os.system(self.shell_str)
-        print(self.shell_str)
+        self.path_list = self.file_Listbox.get(0,END)
+        files= []
+        i=1
+        for file in self.path_list:  
+            expand_name = self.file_service.get_file_expand_name(file)
+            target_file = '{0}{1}{2}'.format(self.temp_path,i,expand_name)  
+            i+=1
+            files.append(target_file)
+            self.file_service.copy_file(file,target_file)
+        self.merge_service.merge(files)
+        self.file_service.delete_file(self.temp_path)
+
