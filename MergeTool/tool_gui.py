@@ -14,6 +14,8 @@ class Init_Window():
 
         self.temp_path = 'd:\\target\\temp\\'   #临时文件夹
         self.output_path='d:\\target\\output\\' #导出文件夹
+        self.curPath = os.path.abspath(os.path.dirname(__file__)) #项目所在文件夹
+        self.folder=''
 
         self.file_service= File_Service()
         self.merge_service = Merge_Service(self.output_path)
@@ -43,10 +45,6 @@ class Init_Window():
         self.container.pack()
         #self.container.grid_propagate(False)
 
-        #创建标签Label:默认的width, heigth表示字符个数和行数
-        self.init_Label = Label_PX(self.container,text="文件合并",width=200,height=20,bg="white")
-        self.init_Label.place(x=10,y=10)
-
         #加密按钮
         #self.encrypt_button = Button(self.container, text="加密", width=10,command=self.encrypt_click)  # 调用内部方法  加()为直接调用
         #self.encrypt_button = Button_PX(self.container, text="加密", width=23,height = 23,image="img/encrypt.png", relief = "solid",bd = 1,command=self.encrypt_click)
@@ -60,34 +58,47 @@ class Init_Window():
         #self.create_key_button = Button_PX(self.container, text="生成密钥",width=23,height = 23,image="img/create-key.png", relief = "solid",bd = 1, command=self.create_keys_click) 
         #self.create_key_button.place(x=60,y=50)
 
-        #合并按钮
-        self.merge_button = Button_PX(self.container, text="合并", width=80,command=self.merge_click)  
-        self.merge_button.place(x=280,y=50)
+        #导出列表按钮
+        self.export_list_button = Button_PX(self.container, text="导出列表", width=80,command=self.export_list_click)  
+        self.export_list_button.place(x=10,y=20)
 
-        #清空日志按钮
-        #self.import_key_button = Button_PX(self.container, text="清空日志", width=80,command=self.clear_log_click)  
-        #self.import_key_button.place(x=370,y=50)
+        #导入列表按钮
+        self.import_list_button = Button_PX(self.container, text="导入列表", width=80,command=self.import_list_click)  
+        self.import_list_button.place(x=100,y=20)
+
+        #清空列表按钮
+        self.clear_list_button = Button_PX(self.container, text="清空列表", width=80,command=self.clear_list_click)  
+        self.clear_list_button.place(x=190,y=20)
 
         #选择文件按钮
         self.open_file_button = Button_PX(self.container, text="选择文件", width=80,command=self.open_file_click) 
-        self.open_file_button.place(x=10,y=80)
+        self.open_file_button.place(x=280,y=20)
 
-        #选择文件夹按钮
-        self.open_folder_button = Button_PX(self.container, text="测试", width=80,command=self.open_folder_click) 
-        self.open_folder_button.place(x=100,y=80)
+        #合并按钮
+        self.merge_button = Button_PX(self.container, text="合并", width=80,command=self.merge_click)  
+        self.merge_button.place(x=370,y=20)
 
-        #创建路径文本框
-        self.file_Text = Text_PX(self.container, width=600, height=25)
-        self.file_Text.place(x=190,y=80)
+        #测试按钮
+        #self.open_folder_button = Button_PX(self.container, text="测试", width=80,command=self.open_folder_click) 
+        #self.open_folder_button.place(x=280,y=20)
+
+        
+        self.temp_path = self.curPath+'\\temp\\'
+
+        #rootPath = curPath[:curPath.find("myProject\\")+len("myProject\\")]  # 获取myProject，也就是项目的根路径
+        #dataPath = os.path.abspath(rootPath + 'data\\train.csv') # 获取tran.csv文件的路径
+
+        self.init_Label = Label_PX(self.container,text="导出文件夹",width=60,height=20)
+        self.init_Label.place(x=10,y=80)
+
+        #导出文件夹路径文本框
+        self.file_Text = Text_PX(self.container, width=700, height=25)
+        self.file_Text.place(x=80,y=80)
+        self.file_Text.insert(1.0,self.output_path)
 
         # 创建列表组件
         self.file_Listbox  = Listbox(self.container,height=15,width=110)          
         self.file_Listbox.place(x=10,y=130)
-
-
-        #创建进度条
-        #self.p_bar = ttk.Progressbar(self.container, length = 780, value = 0, mode = "determinate")
-        #self.p_bar.place(x=10,y=360)
 
         #底部状态栏:信息 
         self.status_bar = Label(self.window, text="就绪", bd=1, relief=SUNKEN,anchor=W,width=100)
@@ -102,13 +113,10 @@ class Init_Window():
     
     #打开文件函数
     def open_file_click(self):
-        #self.window.withdraw()
-        # 清空文本控件
-        self.file_Text.delete('1.0','end')
         # 选择文件
-        p_List =filedialog.askopenfilenames()
+        file_list =filedialog.askopenfilenames()
         #文件列表写入给file_Listbox控件
-        for file in p_List:   
+        for file in file_list:   
             self.file_Listbox.insert(END,file)
 
     #测试函数
@@ -121,6 +129,11 @@ class Init_Window():
         files= []
         i=1
         for file in self.path_list:  
+            if file=='':
+                continue
+            if not(self.folder == ''):
+                file =  '{0}\\{1}'.format(self.folder,file)
+            print(file)
             expand_name = self.file_service.get_file_expand_name(file)
             target_file = '{0}{1}{2}'.format(self.temp_path,i,expand_name)  
             i+=1
@@ -129,3 +142,30 @@ class Init_Window():
         self.merge_service.merge(files)
         self.file_service.delete_file(self.temp_path)
 
+    #导出列表按钮响应函数
+    def export_list_click(self):
+        # 选择文件夹
+        export_path = filedialog.askdirectory()
+        export_list = self.file_Listbox.get(0,END)
+        data=''
+        for file in export_list:  
+            data += file.split('/')[-1]+'\n'
+        self.file_service.write(export_path+'/test.li',data)
+
+    #导入列表按钮响应函数
+    def import_list_click(self):
+        # 选择文件
+        path =filedialog.askopenfilename()
+        self.folder= os.path.split(path)[0].replace('/','\\')  
+        print(self.folder)     
+        files = self.file_service.read(path)
+        file_list = files.split('\n')
+        self.file_Listbox.delete(0,END)
+        for file in file_list:  
+            if file=='':
+                continue 
+            self.file_Listbox.insert(END,file)
+
+    #清空列表按钮响应函数
+    def clear_list_click(self):
+        self.file_Listbox.delete(0,END)

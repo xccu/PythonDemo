@@ -26,6 +26,30 @@ class File_Service():
             else:
                 self.delete_file(file_data)
 
+    #读文件
+    def read(self,filePath):
+        try:
+            f = open(filePath, 'r')
+            result = f.read()
+            return result
+        except Exception as ex:
+            print(ex)
+        finally:
+            if f:
+                f.close()
+            
+    #写文件
+    def write(self,filePath,data):
+        try:
+            f = open(filePath, 'w')
+            f.write(data)
+            #f.write(bytes)
+        except Exception as ex:
+            print(ex)
+        finally:
+            if f:
+                f.close()
+
 
 
 
@@ -35,8 +59,8 @@ class Merge_Service():
     
     def merge(self,pathlist):
         print(pathlist)
-        os.chdir("ts/")
-        #os.chdir(self.output_path)
+        #os.chdir("ts/")
+        os.chdir(self.output_path)
         self.shell_str = '+'.join(pathlist)
         self.shell_str = self.shell_str.replace('/','\\')
         print("cmd")
