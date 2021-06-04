@@ -3,6 +3,7 @@ from tkinter import ttk
 from tkinter import filedialog
 from tool_gui_expand import *
 from tool_service import *
+import _thread
 import os
 
 class Init_Window():
@@ -10,24 +11,17 @@ class Init_Window():
     #构造函数
     def __init__(self,window):
         self.window = window   
-       
+        self.index = 0
 
         self.temp_path = 'd:\\target\\temp\\'   #临时文件夹
         self.output_path='d:\\target\\output\\' #导出文件夹
         self.curPath = os.path.abspath(os.path.dirname(__file__)) #项目所在文件夹
         self.folder=''
 
+        #self.file_service= File_Service(self.bar_callback)
         self.file_service= File_Service()
         self.merge_service = Merge_Service(self.output_path)
-    
-        #self.config = Config()
-        #encrypt_str="{0}_Encryptor".format( self.config.get_option("Encrypt","type"))
-        #print(encrypt_str) 
-        #通过类名反射获取encryptor
-        #self.encryptor = globals()[encrypt_str]()
-        #self.file_util= Flie_Util()
         self.enable=True
-
 
     #初始化
     def init(self):
@@ -44,19 +38,6 @@ class Init_Window():
         self.container = Frame(self.window, width=800, height=430)
         self.container.pack()
         #self.container.grid_propagate(False)
-
-        #加密按钮
-        #self.encrypt_button = Button(self.container, text="加密", width=10,command=self.encrypt_click)  # 调用内部方法  加()为直接调用
-        #self.encrypt_button = Button_PX(self.container, text="加密", width=23,height = 23,image="img/encrypt.png", relief = "solid",bd = 1,command=self.encrypt_click)
-        #self.encrypt_button.place(x=10,y=50)
-
-        #解密按钮
-        #self.decrypt_button = Button_PX(self.container, text="解密", width=23,height = 23,image="img/decrypt.png", relief = "solid",bd = 1, command=self.decrypt_click) 
-        #self.decrypt_button.place(x=35,y=50)
-
-        #生成密钥按钮
-        #self.create_key_button = Button_PX(self.container, text="生成密钥",width=23,height = 23,image="img/create-key.png", relief = "solid",bd = 1, command=self.create_keys_click) 
-        #self.create_key_button.place(x=60,y=50)
 
         #导出列表按钮
         self.export_list_button = Button_PX(self.container, text="导出列表", width=80,command=self.export_list_click)  
@@ -78,26 +59,36 @@ class Init_Window():
         self.merge_button = Button_PX(self.container, text="合并", width=80,command=self.merge_click)  
         self.merge_button.place(x=370,y=20)
 
-        #测试按钮
-        #self.open_folder_button = Button_PX(self.container, text="测试", width=80,command=self.open_folder_click) 
-        #self.open_folder_button.place(x=280,y=20)
+        #删除按钮
+        self.delete_button = Button_PX(self.container, text="删除",width=80,command=self.delete_item_click) 
+        self.delete_button.place(x=460,y=20)
 
-        
+        #上移按钮
+        self.up_button = Button_PX(self.container, text="向上", width=50,command=self.up_item_click)  
+        self.up_button.place(x=10,y=50)
+
+        #下移按钮
+        self.down_button = Button_PX(self.container, text="向下", width=50,command=self.down_item_click)  
+        self.down_button.place(x=100,y=50)
+
         self.temp_path = self.curPath+'\\temp\\'
 
-        #rootPath = curPath[:curPath.find("myProject\\")+len("myProject\\")]  # 获取myProject，也就是项目的根路径
-        #dataPath = os.path.abspath(rootPath + 'data\\train.csv') # 获取tran.csv文件的路径
-
+        #导出文件夹标签
         self.init_Label = Label_PX(self.container,text="导出文件夹",width=60,height=20)
         self.init_Label.place(x=10,y=80)
 
         #导出文件夹路径文本框
-        self.file_Text = Text_PX(self.container, width=700, height=25)
-        self.file_Text.place(x=80,y=80)
-        self.file_Text.insert(1.0,self.output_path)
+        self.export_Text = Text_PX(self.container, width=610, height=25)
+        self.export_Text.place(x=80,y=80)
+        self.export_Text.insert(1.0,self.output_path)
+
+        #打开导出文件夹路径按钮
+        self.export_open_button = Button_PX(self.container, text="打开", width=50,command=self.export_open_click)  
+        self.export_open_button.place(x=700,y=80)
 
         # 创建列表组件
-        self.file_Listbox  = Listbox(self.container,height=15,width=110)          
+        self.file_Listbox  = Listbox(self.container,height=15,width=110,selectmode = "single")  
+        self.file_Listbox.bind('<<ListboxSelect>>',self.listbox_select)
         self.file_Listbox.place(x=10,y=130)
 
         #底部状态栏:信息 
@@ -119,11 +110,65 @@ class Init_Window():
         for file in file_list:   
             self.file_Listbox.insert(END,file)
 
-    #测试函数
-    def open_folder_click(self):
-         #os.remove('d:\\target\\temp\\1.ts')
-         print('test')
+    #删除选项函数
+    def delete_item_click(self):
+        self.file_Listbox.delete(ACTIVE)
 
+    #选项上移函数
+    def up_item_click(self):
+        # 获取选中的列表值
+        a = self.file_Listbox.get(ACTIVE)   
+        # 获取选择值在列表中的位置    
+        p = self.index - 1                      
+        
+        #元组转list
+        path_list = list(self.file_Listbox.get(0,END)) 
+        if p == -1:
+            return
+        else:  # 如果位置不等于-1
+            # 列表中插入位置p，值为选择的值
+            path_list.insert(p, a)  
+            # 删除掉原位置的值
+            del path_list[p + 2]  
+            # 清空列表框
+            self.file_Listbox.delete(0, END)  
+        for item in path_list:  # 循环列表
+            # 列表框最后插入值
+            self.file_Listbox.insert(END, item)  
+            
+        self.index = self.index-1
+        self.file_Listbox.select_set(self.index)
+        self.file_Listbox.activate(self.index)
+        print(self.index)
+
+    #选项下移函数
+    def down_item_click(self):
+        a = self.file_Listbox.get(ACTIVE)
+        p = self.index + 2
+        path_list = list(self.file_Listbox.get(0,END)) #元组转list
+        if p == len(path_list)+1:
+            return
+        
+        path_list.insert(p, a)
+        del path_list[p - 2]
+        self.file_Listbox.delete(0, END)
+        for item in path_list:
+            self.file_Listbox.insert(END, item)
+
+        self.index = self.index+1
+        self.file_Listbox.select_set(self.index)
+        self.file_Listbox.activate(self.index)
+        print(self.index)
+
+    #打开导出目录函数
+    def export_open_click(self):
+        path = self.export_Text.get("1.0","end")  
+        start_directory = r'D:\testdir'
+        print(start_directory)
+        print(path)
+        os.system("explorer.exe %s" % path)
+           
+    #合并函数
     def merge_click(self):
         self.path_list = self.file_Listbox.get(0,END)
         files= []
@@ -169,3 +214,21 @@ class Init_Window():
     #清空列表按钮响应函数
     def clear_list_click(self):
         self.file_Listbox.delete(0,END)
+
+    #选中当前项函数
+    def listbox_select(self,evt):
+        w = evt.widget
+        value = w.get(w.curselection())
+        print(w.curselection()[0])
+        self.index = w.curselection()[0]
+        print(value)
+    
+    #进度条回调函数
+    def bar_callback_thread(self,data):
+        self.status_bar["text"]=data
+    
+    def bar_callback(self,data):
+        _thread.start_new_thread(self.bar_callback_thread,(data))
+        
+
+

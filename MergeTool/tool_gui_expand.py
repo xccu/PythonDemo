@@ -63,6 +63,9 @@ class Text_PX():
     
     def delete(self, index1, index2=None):
         self.text.delete(index1, index2)
+    
+    def get(self,index1, index2=None):
+        return self.text.get(index1, index2)
 
 #button控件，宽高单位：像素
 class Button_PX():
@@ -99,6 +102,7 @@ class Button_PX():
         self.button["fg"] = get_value("fg",kw)
         self.button["font"] = get_value("font",kw)
         self.button["command"] = get_value("command",kw)
+        self.button["font"] = get_value("font",kw)
         self.button.pack()
 
     def place(self,x,y):
