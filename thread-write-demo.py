@@ -1,3 +1,4 @@
+#多线程输出
 import threading
 import _thread
 import time
@@ -17,20 +18,18 @@ def write_string(no,path="test.txt"):
 
 # 创建新线程
 print('开始')
+# 创建线程列表
 threads = []
 for i in range(1,1001):
-    #_thread.start_new_thread(self.encrypt_folder_thread,())
     t = threading.Thread(target=write_string, args=[i])
     t.start()
     threads.append(t)
 
-
 for t in threads:
     t.join()
- 
 print("所有线程任务完成")
 
-#按照字典的key排序输出
+# 按照字典的key排序输出
 list_data=[]
 for i in sorted (dict_data) : 
     list_data.append(dict_data[i])
