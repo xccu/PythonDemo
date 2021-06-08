@@ -13,7 +13,8 @@ class Init_Window():
     
     #构造函数
     def __init__(self,window):
-        self.window = window    
+        self.window = window
+
         #self.window.overrideredirect(True);
         self.config = Config()
         encrypt_str="{0}_Encryptor".format( self.config.get_option("Encrypt","type"))
@@ -59,7 +60,7 @@ class Init_Window():
         #样式字典
         btn_styles = {
             'width':80,'height':23,'bd': 0,
-            'background': "#62E3CD","enterBg":"#4D4D4D","fg":"white" ,
+            'background': "#00E1CB","enterBg":"#4D4D4D","fg":"white" ,
             "leaveBg":"#62E3CD","activebackground":"#969696",
             "compound":"left",'relief': "solid"
         }
@@ -68,11 +69,11 @@ class Init_Window():
 
         #加密按钮
         #self.encrypt_button = Button(self.container, text="加密", width=10,command=self.encrypt_click)  # 调用内部方法  加()为直接调用
-        self.encrypt_button = Button_PX(self.cmd_frame, text="  加密", image="img/encrypt.png", **btn_styles,command=self.encrypt_click)
+        self.encrypt_button = Button_PX(self.cmd_frame, text="加密", image="img/encrypt.png", **btn_styles,command=self.encrypt_click)
         self.encrypt_button.place(x=10,y=10)
 
         #解密按钮
-        self.decrypt_button = Button_PX(self.cmd_frame, text="  解密", image="img/decrypt.png", **btn_styles,command=self.decrypt_click) 
+        self.decrypt_button = Button_PX(self.cmd_frame, text="解密", image="img/decrypt.png", **btn_styles,command=self.decrypt_click) 
         self.decrypt_button.place(x=10,y=35)
 
         #导出密钥按钮
@@ -85,11 +86,11 @@ class Init_Window():
 
         #生成密钥按钮
         self.create_key_button = Button_PX(self.cmd_frame, text="生成密钥",image="img/create-key.png", **btn_styles,command=self.create_keys_click) 
-        self.create_key_button.place(x=280,y=35)
+        self.create_key_button.place(x=190,y=35)
 
         #设置按钮
         self.setting_button = Button_PX(self.cmd_frame, text="设置", **btn_styles) 
-        self.setting_button.place(x=280,y=10)
+        self.setting_button.place(x=190,y=10)
 
         #创建标签Label:默认的width, heigth表示字符个数和行数
         #文本内容：copyright by Charlie(圣书体)
