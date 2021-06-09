@@ -5,6 +5,7 @@ from rosetta_config import *
 from rosetta_encryptor import *
 from rosetta_util import *
 from rosetta_gui_expand import *
+from rosetta_setting_gui import *
 import _thread
 import time
 
@@ -14,7 +15,7 @@ class Init_Window():
     #构造函数
     def __init__(self,window):
         self.window = window
-
+        self.flag = False
         #self.window.overrideredirect(True);
         self.config = Config()
         encrypt_str="{0}_Encryptor".format( self.config.get_option("Encrypt","type"))
@@ -40,9 +41,11 @@ class Init_Window():
         self.container = Frame(self.window, width=800, height=430,background="#F2F2F2")
         self.container.pack()
 
+        self.cmd_frame = Frame(self.container, width=800, height=30,background="#4D4D4D")
+        self.cmd_frame.place(x=0,y=0)
 
         self.cmd_frame = Frame(self.container, width=780, height=70,background="#FFFFFF")
-        self.cmd_frame.place(x=10,y=10)
+        self.cmd_frame.place(x=10,y=40)
 
         #self.menubar = Menu(self.window)
         #file_menu = Menu(self.menubar, tearoff=False)  # tearoff=False 表示这个菜单可以被拖拽出来
@@ -60,8 +63,8 @@ class Init_Window():
         #样式字典
         btn_styles = {
             'width':80,'height':23,'bd': 0,
-            'background': "#00E1CB","enterBg":"#4D4D4D","fg":"white" ,
-            "leaveBg":"#62E3CD","activebackground":"#969696",
+            'background': "#28D2BE","enterBg":"#4D4D4D","fg":"white" ,
+            "leaveBg":"#28D2BE","activebackground":"#969696",
             "compound":"left",'relief': "solid"
         }
         btn_out_styles = {'relief': "solid",'bd': 0,'bdcolor':"#BCBCBC","background":"#4D4D4D","fg":"white","activebackground":"#969696",}
@@ -86,11 +89,15 @@ class Init_Window():
 
         #生成密钥按钮
         self.create_key_button = Button_PX(self.cmd_frame, text="生成密钥",image="img/create-key.png", **btn_styles,command=self.create_keys_click) 
-        self.create_key_button.place(x=190,y=35)
+        self.create_key_button.place(x=190,y=10)
 
         #设置按钮
-        self.setting_button = Button_PX(self.cmd_frame, text="设置", **btn_styles) 
-        self.setting_button.place(x=190,y=10)
+        self.setting_button = Button_PX(self.cmd_frame, text="设置", **btn_styles,command = self.setting_click) 
+        self.setting_button.place(x=190,y=35)
+
+        #测试按钮
+        self.setting_button = Button_PX(self.cmd_frame, text="测试", **btn_styles,command=self.test) 
+        self.setting_button.place(x=280,y=10)
 
         #创建标签Label:默认的width, heigth表示字符个数和行数
         #文本内容：copyright by Charlie(圣书体)
@@ -101,24 +108,24 @@ class Init_Window():
 
         #选择文件按钮
         self.open_file_button = Button_PX(self.container, text="选择文件", width=80,**btn_out_styles,command=self.open_file_click) 
-        self.open_file_button.place(x=10,y=100)
+        self.open_file_button.place(x=10,y=130)
 
         #选择文件夹按钮
         self.open_folder_button = Button_PX(self.container, text="选择文件夹", width=80,**btn_out_styles,command=self.open_folder_click) 
-        self.open_folder_button.place(x=100,y=100)
+        self.open_folder_button.place(x=100,y=130)
 
         #创建路径文本框
         self.file_Text = Text_PX(self.container, width=600, height=25,**text_styles)
-        self.file_Text.place(x=190,y=100)
+        self.file_Text.place(x=190,y=130)
 
         #创建日志文本框
         #self.log_Text = Text(self.container, width=111, height=15)
         self.log_Text = Text_PX(self.container, width=780, height=200,**text_styles)
-        self.log_Text.place(x=10,y=150)
+        self.log_Text.place(x=10,y=180)
 
         #创建进度条
         self.p_bar = ttk.Progressbar(self.container, length = 780, value = 0, mode = "determinate")
-        self.p_bar.place(x=10,y=360)
+        self.p_bar.place(x=10,y=390)
 
         #底部状态栏:信息 
         self.status_bar = Label(self.window, text="就绪", bd=1, relief=SUNKEN,anchor=W,width=100)
@@ -242,6 +249,12 @@ class Init_Window():
         self.encryptor.create_key()
         self.log_Text.insert(1.0,'已生成密钥'+'\n')
 
+    #打开设置窗口函数
+    def setting_click(self):
+        
+        self.sub_Window =Setting_Window(Toplevel())
+        self.sub_Window.init()
+
     #清空日志函数
     def clear_log_click(self):
         self.log_Text.delete('1.0','end')
@@ -258,3 +271,8 @@ class Init_Window():
         self.p_bar["value"]=0
         self.encryptor.progress=0
         self.enable=True
+
+    #测试函数
+    def test(self):
+        self.window.overrideredirect(self.flag)
+        self.flag=not self.flag
