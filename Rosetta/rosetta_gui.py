@@ -63,11 +63,11 @@ class Init_Window():
         #样式字典
         btn_styles = {
             'width':80,'height':23,'bd': 0,
-            'background': "#28D2BE","enterBg":"#4D4D4D","fg":"white" ,
-            "leaveBg":"#28D2BE","activebackground":"#969696",
+            'background': "#00ABFF","enterBg":"#4D4D4D","fg":"white" ,
+            "leaveBg":"#00ABFF","activebackground":"#7689ED",
             "compound":"left",'relief': "solid"
         }
-        btn_out_styles = {'relief': "solid",'bd': 0,'bdcolor':"#BCBCBC","background":"#4D4D4D","fg":"white","activebackground":"#969696",}
+        btn_out_styles = {'relief': "solid",'bd': 0,'bdcolor':"#BCBCBC","background":"#00ABFF","enterBg":"#4D4D4D","fg":"white","leaveBg":"#00ABFF","activebackground":"#7689ED",}
         text_styles = {'bd':1,'bdcolor':"#BCBCBC"}
 
         #加密按钮

@@ -77,7 +77,8 @@ class AES_Encryptor(IEncryptor):
 
             #写加密后的文件
             self.file_Util.write_file_stream(filepath,en_bytes_array)
-
+            #重命名
+            os.rename(filepath,filepath+'.ros')
             return "s_"
         except Exception as ex:
             return self.exception_util.print_exctption("encrypt",ex)
@@ -109,6 +110,8 @@ class AES_Encryptor(IEncryptor):
         
             #写解密后的文件
             self.file_Util.write_file_stream(filepath,bytes_array)
+            #重命名
+            os.rename(filepath,filepath[:-4])
             return "s_"
         except Exception as ex:
             return self.exception_util.get_exctption_info("decrypt",ex)
@@ -170,6 +173,9 @@ class RSA_Encryptor(IEncryptor):
 
     # 使用公钥对文件进行rsa 分段加密
     def encrypt(self,filepath):
+        #判断扩展名
+        #if filepath[:-4]!='.ros': 
+        #    return "s_"
         try:
             begin_time = time()
 
@@ -186,6 +192,8 @@ class RSA_Encryptor(IEncryptor):
             print(len(en_bytes_array))
             #写解密后的文件
             self.file_Util.write_file_stream(filepath,en_bytes_array)
+            #重命名
+            os.rename(filepath,filepath+'.ros')
 
             end_time = time()
             self.log_func('耗时：{}'.format(end_time-begin_time)) 
@@ -273,6 +281,8 @@ class RSA_Encryptor(IEncryptor):
         
             #写解密后的文件
             self.file_Util.write_file_stream(filepath,bytes_array)
+            #重命名
+            os.rename(filepath,filepath[:-4])
 
             end_time = time()
             self.log_func('耗时：{}'.format(end_time-begin_time)) 
