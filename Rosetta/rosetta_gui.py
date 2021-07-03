@@ -41,24 +41,20 @@ class Init_Window():
         self.container = Frame(self.window, width=800, height=430,background="#F2F2F2")
         self.container.pack()
 
-        self.cmd_frame = Frame(self.container, width=800, height=30,background="#4D4D4D")
-        self.cmd_frame.place(x=0,y=0)
+        self.head_frame = Frame(self.container, width=800, height=30,background="#4D4D4D")
+        self.head_frame.place(x=0,y=0)
 
-        self.cmd_frame = Frame(self.container, width=780, height=70,background="#FFFFFF")
+        self.cmd_frame = Frame(self.container, width=385, height=70,background="#FFFFFF")
         self.cmd_frame.place(x=10,y=40)
 
-        #self.menubar = Menu(self.window)
-        #file_menu = Menu(self.menubar, tearoff=False)  # tearoff=False 表示这个菜单可以被拖拽出来
-        #file_menu.add_command(label='枸杞')
-        #file_menu.add_command(label='梧桐')
-        #file_menu.add_separator()  # 一个下拉菜单的分割线
-        #file_menu.add_command(label='酸枣')
+        self.setting_frame = Frame(self.container, width=385, height=70,background="#FFFFFF")
+        self.setting_frame.place(x=405,y=40)
 
-        #self.menubar.add_cascade(label='木部', menu=file_menu)
-        #self.menubar.add_cascade(label='设置')
-
-        #self.window.config(menu=self.menubar)
-
+        #创建标签Label:默认的width, heigth表示字符个数和行数
+        #文本内容：copyright by Charlie(圣书体)
+        ft=("Arial", 30, "bold",)
+        self.init_Label = Label_PX(self.head_frame,text="𓋴𓍯𓊪𓇌𓂋𓏭𓎼𓉔𓏏𓃀𓇌𓋴𓉔𓄿𓂋𓃭𓏭𓇋",width=360,height=30,bg="#4D4D4D",font = ft,fg = "white")
+        self.init_Label.place(x=450,y=-1)
 
         #样式字典
         btn_styles = {
@@ -98,13 +94,6 @@ class Init_Window():
         #测试按钮
         self.setting_button = Button_PX(self.cmd_frame, text="测试", **btn_styles,command=self.test) 
         self.setting_button.place(x=280,y=10)
-
-        #创建标签Label:默认的width, heigth表示字符个数和行数
-        #文本内容：copyright by Charlie(圣书体)
-        ft=("Arial", 34, "bold")
-        self.init_Label = Label_PX(self.cmd_frame,text="𓋴𓍯𓊪𓇌𓂋𓏭𓎼𓉔𓏏𓃀𓇌𓋴𓉔𓄿𓂋𓃭𓏭𓇋",width=360,height=40,bg="white",font = ft)
-        self.init_Label.place(x=410,y=10)
-
 
         #选择文件按钮
         self.open_file_button = Button_PX(self.container, text="选择文件", width=80,**btn_out_styles,command=self.open_file_click) 
@@ -192,6 +181,8 @@ class Init_Window():
         result = self.encryptor.encrypt(filePath)
         if result=="s_":
             self.log_Text.insert(1.0,'已加密：'+filePath+'\n')
+        elif result=="k_":
+            self.log_Text.insert(1.0,'已跳过：'+filePath+'\n')
         else:
             self.log_Text.insert(1.0,result+'\n')
 
@@ -222,6 +213,8 @@ class Init_Window():
         result = self.encryptor.decrypt(filePath)
         if result=="s_":
             self.log_Text.insert(1.0,'已解密：'+filePath+'\n')
+        elif result=="k_":
+            self.log_Text.insert(1.0,'已跳过：'+filePath+'\n')
         else:
             self.log_Text.insert(1.0,result+'\n')
     

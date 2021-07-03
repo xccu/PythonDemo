@@ -52,6 +52,11 @@ class AES_Encryptor(IEncryptor):
         
     #加密
     def encrypt(self,filepath):
+        temp = filepath[-4:]
+        print(temp)
+        #判断扩展名
+        if filepath[-4:]=='.ros': 
+            return "k_"
         try:
             #bytes读取文件
             bytes_array=self.file_Util.read_file_stream(filepath,2048)
@@ -85,6 +90,10 @@ class AES_Encryptor(IEncryptor):
 
     #解密
     def decrypt(self,filepath):
+        print(filepath[-4:])
+        #判断扩展名
+        if filepath[-4:]!='.ros': 
+            return "k_"
         try:
             #bytes读取文件
             en_bytes_array=self.file_Util.read_file_stream(filepath,2048)
@@ -174,8 +183,8 @@ class RSA_Encryptor(IEncryptor):
     # 使用公钥对文件进行rsa 分段加密
     def encrypt(self,filepath):
         #判断扩展名
-        #if filepath[:-4]!='.ros': 
-        #    return "s_"
+        if filepath[-4:]=='.ros': 
+            return "k_"
         try:
             begin_time = time()
 
@@ -265,7 +274,10 @@ class RSA_Encryptor(IEncryptor):
         
 
     # 使用私钥对文件进行rsa 分段解密
-    def decrypt(self,filepath):
+    def decrypt(self,filepath):     
+        #判断扩展名
+        if filepath[-4:]!='.ros': 
+            return "k_"
         try:
             begin_time = time()
 
