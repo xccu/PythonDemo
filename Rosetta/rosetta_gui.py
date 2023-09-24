@@ -66,6 +66,7 @@ class Init_Window():
         btn_out_styles = {'relief': "solid",'bd': 0,'bdcolor':"#BCBCBC","background":"#00ABFF","enterBg":"#4D4D4D","fg":"white","leaveBg":"#00ABFF","activebackground":"#7689ED",}
         text_styles = {'bd':1,'bdcolor':"#BCBCBC"}
 
+        #cmd_frame
         #加密按钮
         #self.encrypt_button = Button(self.container, text="加密", width=10,command=self.encrypt_click)  # 调用内部方法  加()为直接调用
         self.encrypt_button = Button_PX(self.cmd_frame, text="加密", image="img/encrypt.png", **btn_styles,command=self.encrypt_click)
@@ -94,6 +95,14 @@ class Init_Window():
         #测试按钮
         self.setting_button = Button_PX(self.cmd_frame, text="测试", **btn_styles,command=self.test) 
         self.setting_button.place(x=280,y=10)
+
+        #setting_frame
+        #跳过文件文本框
+        self.skip_Text = Text_PX(self.setting_frame, width=250, height=25,text="*.java,*.txt",**text_styles)
+        self.skip_Text.place(x=100,y=10)
+
+        self.skip_Label = Label_PX(self.setting_frame,text="跳过文件类型:",width=80,height=30,bg="white")
+        self.skip_Label.place(x=10,y=10)
 
         #选择文件按钮
         self.open_file_button = Button_PX(self.container, text="选择文件", width=80,**btn_out_styles,command=self.open_file_click) 
